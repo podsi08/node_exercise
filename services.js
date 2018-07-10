@@ -20,6 +20,14 @@ exports.searchForAromas = function(request, base) {
   return results
 };
 
+exports.findDeletedCoffee = function(name, base) {
+  return base.find(coffee => coffee.name === name)
+};
+
+exports.prepareNewCoffeesArray = function(name, base) {
+  return base.filter(coffee => coffee.name !== name)
+};
+
 function toUnderscores(str) {
   return str.toLowerCase().replace(/ /g, '_');
 }
