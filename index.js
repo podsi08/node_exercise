@@ -1,12 +1,16 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const fs = require('fs');
 
 const services = require('./services');
 const search = services.searchInBase;
 const aromaSearch = services.searchForAromas;
+const createCoffee = services.createNewCoffeeObj;
+const validate = services.validate;
 
-let getDataFromMemoryDb = require('./storage');
+const storageMethods = require('./storage');
+const getDataFromMemoryDb = storageMethods.getData;
+const writeToFile = storageMethods.write;
+
 
 const app = express();
 
@@ -31,58 +35,20 @@ app.get('/aromas/:aroma', function (req, res) {
 });
 
 
-function createNewCoffeeObj (id, name, country, aromas, roast_date, strength) {
-  return {
-    id,
-    name,
-    details: {
-      country,
-      aromas,
-      roast_date,
-      strength
-    }
-  };
-}
-
 app.post('/coffee/add', function (req, res) {
-  const errors = [];
-
   const { name, country, aromas, roast_date, strength } = req.body;
+  let coffeesArray = getDataFromMemoryDb();
 
-  if (!name) {
-    errors.push('Name required!');
-  }
-
-  if (!country) {
-    errors.push('Country required!');
-  }
-
-  if (!aromas) {
-    errors.push('Give atl east one aroma!');
-  }
-
-  if (!roast_date) {
-    errors.push('Roast date required!');
-  }
-
-  if (!strength || !Number.isInteger(strength) || strength < 1 || strength > 5) {
-    errors.push('Strength is required and must be integer between 1 and 5!');
-  }
+  const errors = validate(name, country, aromas, roast_date, strength, coffeesArray);
 
   if (errors.length === 0) {
-    let coffeesArray = getDataFromMemoryDb();
-
     const nextId = coffeesArray.length;
 
-    const newCoffee = createNewCoffeeObj(nextId, name, country, aromas, roast_date, strength);
+    const newCoffee = createCoffee(nextId, name, country, aromas, roast_date, strength);
     coffeesArray.push(newCoffee);
 
-    fs.writeFile("./coffees.json", JSON.stringify(coffeesArray), function(err) {
-      if(err) {
-        return console.log(err);
-      }
-      console.log("The file was saved!");
-    });
+    writeToFile(coffeesArray);
+
     return res.send(newCoffee);
 
   } else {

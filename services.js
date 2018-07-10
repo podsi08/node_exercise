@@ -1,5 +1,3 @@
-const fs = require('fs');
-
 exports.searchInBase = function(request, base, key) {
   const query = request.params[key];
   const selectedItem = base.find(item => toUnderscores(item[key].toString()) === query);
@@ -26,13 +24,45 @@ function toUnderscores(str) {
   return str.toLowerCase().replace(/ /g, '_');
 }
 
-exports.readFromFile = function() {
-  return new Promise((resolve) => {
-    //fs.readFile nic nie zwraca
-    // kiedy promise się rozwiąże zostanie zwrucona tablica z wynikami
-    fs.readFile('./coffees.json', 'utf8', (err, data) => {
-      const resultData = JSON.parse(data);
-      resolve(resultData);
-    });
-  });
+exports.createNewCoffeeObj = function(id, name, country, aromas, roast_date, strength) {
+  return {
+    id,
+    name,
+    details: {
+      country,
+      aromas,
+      roast_date,
+      strength
+    }
+  };
+};
+
+exports.validate = function(name, country, aromas, date, strength, coffees){
+  const errors = [];
+
+  if (!name) {
+    errors.push('Name required!');
+  }
+
+  if (!country) {
+    errors.push('Country required!');
+  }
+
+  if (!aromas) {
+    errors.push('Give atl east one aroma!');
+  }
+
+  if (!date) {
+    errors.push('Roast date required!');
+  }
+
+  if (!strength || !Number.isInteger(strength) || strength < 1 || strength > 5) {
+    errors.push('Strength is required and must be integer between 1 and 5!');
+  }
+
+  if (typeof (coffees.find(coffee => coffee.name === name)) !== "undefined") {
+    errors.push('Coffee with the same name already is in base!')
+  }
+
+  return errors;
 };
