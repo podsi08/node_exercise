@@ -1,12 +1,12 @@
 exports.searchInBase = function(request, base, key) {
   const query = request.params[key];
-  const selectedItem = base.find(item => toUnderscores(item[key].toString()) === query);
-  if (typeof selectedItem === "undefined") {
+  const selectedItems = base.filter(item => item[key].toLowerCase().indexOf(query.toLowerCase()) > -1);
+  if (selectedItems.length < 1) {
     return {
       error: 'No results'
     }
   }
-  return selectedItem;
+  return selectedItems;
 };
 
 exports.searchForAromas = function(request, base) {
@@ -20,6 +20,13 @@ exports.searchForAromas = function(request, base) {
   return results
 };
 
+exports.searchForUser = function(request, base) {
+  const name = request.body.name;
+  const password = request.body.password;
+
+  return base.find(user => user.name === name && user.password === password);
+};
+
 exports.findDeletedCoffee = function(name, base) {
   return base.find(coffee => coffee.name === name)
 };
@@ -28,11 +35,8 @@ exports.prepareNewCoffeesArray = function(name, base) {
   return base.filter(coffee => coffee.name !== name)
 };
 
-function toUnderscores(str) {
-  return str.toLowerCase().replace(/ /g, '_');
-}
-
-exports.createNewCoffeeObj = function(id, name, country, aromas, roast_date, strength) {
+exports.createNewCoffeeObj = function(id, {name, country, aromas, roast_date, strength}) {
+  console.log(id, name, country, aromas, roast_date, strength);
   return {
     id,
     name,
