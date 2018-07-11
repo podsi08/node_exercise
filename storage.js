@@ -1,8 +1,5 @@
 const fs = require('fs');
 
-const coffeesFile = './coffees.json';
-const usersFile = './users.json';
-const tokensFile = './tokens.json';
 let db = [];
 let usersBase = [];
 let tokensBase = [];
@@ -28,15 +25,15 @@ const writeToFile = function(array, file) {
 };
 
 //wywołuję funkcję readFromFile, która po rozwiązaniu promisa zwróci tablicę z danymi
-readFromFile(coffeesFile).then((fileData) => {
+readFromFile('./coffees.json').then((fileData) => {
   db = fileData;
 });
 
-readFromFile(usersFile).then((fileData) => {
+readFromFile('./users.json').then((fileData) => {
   usersBase = fileData;
 });
 
-readFromFile(tokensFile).then((fileData) => {
+readFromFile('./tokens.json').then((fileData) => {
   tokensBase = fileData;
 });
 

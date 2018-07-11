@@ -1,12 +1,24 @@
-exports.searchInBase = function(request, base, key) {
-  const query = request.params[key];
-  const selectedItems = base.filter(item => item[key].toLowerCase().indexOf(query.toLowerCase()) > -1);
+exports.searchForName = function(request, base) {
+  const query = request.params['name'];
+  const selectedItems = base.filter(item => item.name.toLowerCase().indexOf(query.toLowerCase()) > -1);
   if (selectedItems.length < 1) {
     return {
       error: 'No results'
     }
   }
   return selectedItems;
+};
+
+exports.searchForId = function(request, base) {
+  const query = request.params['id'];
+  console.log(query, typeof query)
+  const selectedItem = base.find(item => item.id.toString() === query);
+  if (typeof selectedItem === "undefined") {
+    return {
+      error: 'No results'
+    }
+  }
+  return selectedItem;
 };
 
 exports.searchForAromas = function(request, base) {
@@ -31,14 +43,13 @@ exports.findDeletedCoffee = function(name, base) {
   return base.find(coffee => coffee.name === name)
 };
 
-exports.prepareNewCoffeesArray = function(name, base) {
-  return base.filter(coffee => coffee.name !== name)
+exports.prepareNewArray = function(deletedItemValue, base, key) {
+  return base.filter(item => item[key] !== deletedItemValue)
 };
 
-exports.createNewCoffeeObj = function(id, {name, country, aromas, roast_date, strength}) {
-  console.log(id, name, country, aromas, roast_date, strength);
+exports.createNewCoffeeObj = function({nextId, name, country, aromas, roast_date, strength}) {
   return {
-    id,
+    id: nextId,
     name,
     details: {
       country,
