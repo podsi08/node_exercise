@@ -62,7 +62,7 @@ app.get('/coffee/aromas/:aroma', function (req, res) {
 app.delete('/coffee/delete', function (req, res) {
   const { name } = req.body;
   let coffeesArray = getDataFromMemoryDb();
-  console.log(prepareNewArray(name, coffeesArray, 'name'));
+
   //zapisuję do pliku nową tablicę z usuniętą wybraną kawą
   writeToFile(prepareNewArray(name, coffeesArray, 'name'), './coffees.json');
 
@@ -104,6 +104,7 @@ app.post('/login', function (req, res) {
 
   if (typeof user === "undefined") {
     res.status(401).send({ error: 'unauthorized' });
+    return;
   }
 
   let newToken = uuidv4();
